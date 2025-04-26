@@ -1,3 +1,4 @@
+
 import streamlit as st
 import requests
 import urllib.parse
@@ -56,7 +57,6 @@ with st.sidebar:
         for idx, sessao in enumerate(reversed(st.session_state["historico"])):
             label = f"{sessao['timestamp']} - {sessao['banda']}"
             if st.button(label, key=idx):
-                # Seleciona o histórico sem criar novo
                 st.session_state["sessao_selecionada"] = sessao
     else:
         st.info("Nenhuma exploração ainda.")
@@ -66,42 +66,7 @@ with st.sidebar:
 # Área principal
 st.title("🎶 Descubra Novos Sons")
 
-if st.session_state["sessao_selecionada"]:
-    sessao = st.session_state["sessao_selecionada"]
-
-    # Mensagem de Opinião
-    st.subheader(f"🎤 O que achei de {sessao['banda']}:")
-    st.write(sessao["opiniao"])
-
-    # Layout dos blocos com sombra e recolhíveis
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        with st.expander("🖼️ Fotos & Curiosidades"):
-            st.markdown(f"[Veja imagens de {sessao['banda']}]({buscar_imagens_google(sessao['banda'])})")
-            st.caption("Clique para ver imagens relacionadas no Google.")
-
-    with col2:
-        with st.expander("🌟 Bandas Similares"):
-            st.write(sessao["sugestoes"])
-
-    with col3:
-        with st.expander("🎵 Playlist Indicada + Capa Fake"):
-            st.markdown(f"**Capa do álbum:** {sessao['descricao_capa']}")
-            st.markdown(f"[Veja imagens inspiradas nessa capa]({sessao['link_imagens']})")
-            st.markdown("---")
-            for musica, link in sessao["playlist"]:
-                if link:
-                    st.markdown(f"- [{musica}]({link})")
-                else:
-                    st.markdown(f"- {musica}")
-
-    with col4:
-        with st.expander("🚀 Nerdice Radical"):
-            st.write(sessao["viagem"])
-
-# Exibe histórico e impede a criação de nova sessão
-if not st.session_state["sessao_selecionada"]:
+with st.container():
     banda_favorita = st.text_input("Digite o nome de uma banda ou artista que você curte:")
 
     if banda_favorita:
@@ -141,6 +106,41 @@ if not st.session_state["sessao_selecionada"]:
         }
         st.session_state["historico"].append(nova_sessao)
         st.session_state["sessao_selecionada"] = nova_sessao
+
+# Exibe sessão selecionada
+if st.session_state["sessao_selecionada"]:
+    sessao = st.session_state["sessao_selecionada"]
+
+    # Mensagem de Opinião
+    st.subheader(f"🎤 O que achei de {sessao['banda']}:")
+    st.write(sessao["opiniao"])
+
+    # Layout dos blocos com sombra e recolhíveis
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        with st.expander("🖼️ Fotos & Curiosidades"):
+            st.markdown(f"[Veja imagens de {sessao['banda']}]({buscar_imagens_google(sessao['banda'])})")
+            st.caption("Clique para ver imagens relacionadas no Google.")
+
+    with col2:
+        with st.expander("🌟 Bandas Similares"):
+            st.write(sessao["sugestoes"])
+
+    with col3:
+        with st.expander("🎵 Playlist Indicada + Capa Fake"):
+            st.markdown(f"**Capa do álbum:** {sessao['descricao_capa']}")
+            st.markdown(f"[Veja imagens inspiradas nessa capa]({sessao['link_imagens']})")
+            st.markdown("---")
+            for musica, link in sessao["playlist"]:
+                if link:
+                    st.markdown(f"- [{musica}]({link})")
+                else:
+                    st.markdown(f"- {musica}")
+
+    with col4:
+        with st.expander("🚀 Nerdice Radical"):
+            st.write(sessao["viagem"])
 
 # Estilo de sombra para os blocos (adicionado via markdown)
 st.markdown("""
